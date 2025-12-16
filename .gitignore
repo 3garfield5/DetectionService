@@ -1,0 +1,7 @@
+/backend/venv
+/backend/ml_service/yolo-venv
+backend/snapshots
+backend/ml_service/yolo11n.pt
+backend/media_server/IMG_5320.MOV
+backend/media_server/test.mp4
+backend/db/base.py
