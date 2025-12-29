@@ -62,7 +62,7 @@ def to_event_out(e) -> schemas.EventOut:
     )
 
 
-@router.get("/", response_model=List[schemas.EventOut])
+@router.get("", response_model=List[schemas.EventOut])
 def get_events(
     status: Optional[schemas.EventStatusLiteral] = Query(None),
     limit: int = Query(50, ge=1, le=200),
