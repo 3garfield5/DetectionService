@@ -1,16 +1,21 @@
 from fastapi import APIRouter
+import os
 
 router = APIRouter(
     prefix="/streams",
     tags=["streams"],
 )
 
-HLS_URL = "http://localhost:8888/live_stream/index.m3u8"
+HLS_PUBLIC_URL = os.getenv(
+    "HLS_PUBLIC_URL",
+)
 
 
 @router.get("/hls")
 def get_stream_hls():
     """
-    Возвращает HLS-ссылку для единственного потока.
+    Возвращает публичную HLS-ссылку для потока
     """
-    return {"hls_url": HLS_URL}
+    return {
+        "hls_url": HLS_PUBLIC_URL
+    }

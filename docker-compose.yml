@@ -1,0 +1,130 @@
+version: "3.8"
+
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: mediamtx
+    restart: unless-stopped
+    ports:
+      - "8554:8554" # RTSP
+      - "1935:1935" # RTMP
+      - "8888:8888" # HLS
+    environment:
+      - MTX_PROTOCOLS=tcp
+      - MTX_WEBRTC=no
+
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    env_file: .env
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # Console
+    volumes:
+      - miniodata:/data
+    # ⚠️ Не используем healthcheck (в образе может не быть curl/wget),
+    # вместо этого делаем надежное ожидание в minio-init.
+
+  minio-init:
+    image: minio/mc:latest
+    restart: "no"
+    env_file: .env
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for MinIO to be ready...';
+      until mc alias set local ${S3_ENDPOINT} ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} 2>/dev/null; do
+        sleep 1;
+      done;
+      echo 'MinIO ready. Ensuring bucket exists...';
+      mc mb -p local/${S3_BUCKET} || true;
+      mc anonymous set download local/${S3_BUCKET} || true;
+      echo 'MinIO init done.';
+      "
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      S3_ENDPOINT: ${S3_ENDPOINT}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_SECURE: ${S3_SECURE}
+    ports:
+      - "${BACKEND_PORT}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+
+  emulator:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    env_file: .env
+    command: ["python3", "media_server/camera_emulator.py"]
+    environment:
+      RTSP_URL: ${RTSP_PUBLISH_URL}
+      EMULATOR_SCALE_W: ${EMULATOR_SCALE_W}
+      EMULATOR_FPS: ${EMULATOR_FPS}
+      EMULATOR_BITRATE: ${EMULATOR_BITRATE}
+      EMULATOR_BUFSIZE: ${EMULATOR_BUFSIZE}
+      EMULATOR_GOP: ${EMULATOR_GOP}
+    depends_on:
+      - mediamtx
+
+  ml:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    env_file: .env
+    command: ["python3", "ml_service/ml.py"]
+    environment:
+      RTSP_URL: ${RTSP_READ_URL}
+      BACKEND_URL: ${BACKEND_EVENTS_URL}
+      MODEL_PATH: ${MODEL_PATH}
+    depends_on:
+      - backend
+      - mediamtx
+      - emulator
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    env_file: .env
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  miniodata:

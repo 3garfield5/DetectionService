@@ -4,9 +4,15 @@ from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
 
 from db.base import Base, engine
+from db import models
 from api import events, streams, internal
 
+
 app = FastAPI(title="Abandoned Object Detection API")
+
+@app.on_event("startup")
+def startup():
+    Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
     CORSMiddleware,

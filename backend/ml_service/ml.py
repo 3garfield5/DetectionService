@@ -1,6 +1,8 @@
-# ml_service/yolo_stream.py
+import os
+
 import time
 import base64
+from dotenv import load_dotenv
 from datetime import datetime, timezone
 
 import cv2
@@ -8,11 +10,17 @@ import numpy as np
 import requests
 from ultralytics import YOLO
 
-# ==== НАСТРОЙКИ ====
+load_dotenv()
 
-RTSP_URL = "rtsp://localhost:8554/live_stream?tcp"
-BACKEND_URL = "http://127.0.0.1:8000/internal/events"
-MODEL_PATH = "yolo11n.pt"
+RTSP_URL = os.getenv(
+    "RTSP_URL",
+)
+BACKEND_URL = os.getenv(
+    "BACKEND_URL",
+)
+MODEL_PATH = os.getenv(
+    "MODEL_PATH",
+)
 
 PERSON_CLASS = 0
 
@@ -30,8 +38,6 @@ MAX_OBJ_AREA_FRAC = 0.2
 
 TARGET_FPS = 10
 BRIGHTEN = False
-
-# =====================
 
 def frame_to_base64(frame, quality=60):
     encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), quality]

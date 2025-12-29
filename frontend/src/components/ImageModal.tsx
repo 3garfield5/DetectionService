@@ -15,7 +15,6 @@ export default function ImageModal({ event, onClose }: ImageModalProps) {
         className="relative max-w-5xl w-full max-h-[90vh] mx-4 bg-slate-950/95 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
           <div className="flex flex-col">
             <span className="text-sm text-slate-200">
@@ -33,7 +32,6 @@ export default function ImageModal({ event, onClose }: ImageModalProps) {
           </button>
         </div>
 
-        {/* Image */}
         <div className="flex-1 bg-black flex items-center justify-center">
           {/* eslint-disable-next-line jsx-a11y/img-redundant-alt */}
           <img
@@ -43,7 +41,6 @@ export default function ImageModal({ event, onClose }: ImageModalProps) {
           />
         </div>
 
-        {/* Footer info */}
         <div className="px-4 py-2 border-t border-slate-800 text-xs text-slate-400 flex flex-wrap gap-x-4 gap-y-1">
           <span>Object ID: {event.object_id ?? "—"}</span>
           <span>Owner ID: {event.owner_id ?? "—"}</span>

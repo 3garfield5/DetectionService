@@ -57,7 +57,7 @@ export default function HlsPlayer() {
         hls.destroy();
       }
     };
-  }, []); // зависимостей нет — один поток
+  }, []);
 
   return (
     <div className="w-full h-full flex flex-col rounded-2xl bg-black overflow-hidden shadow-lg">

@@ -50,13 +50,11 @@ export default function EventCard({
 
   return (
     <div className="flex gap-3 py-3 px-3 hover:bg-slate-900/60 rounded-xl transition-colors border border-slate-800/70">
-      {/* превью кликабельно */}
       <button
         type="button"
         className="w-28 h-20 rounded-lg overflow-hidden bg-slate-900 shrink-0 border border-slate-800 hover:border-slate-500 transition-colors"
         onClick={handleImageClick}
       >
-        {/* eslint-disable-next-line jsx-a11y/img-redundant-alt */}
         <img
           src={event.frame_snapshot_url}
           alt={`Event ${event.id} snapshot`}
