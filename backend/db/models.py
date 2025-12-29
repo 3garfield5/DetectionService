@@ -1,4 +1,3 @@
-# app/db/models.py
 import enum
 from sqlalchemy import (
     Column, Integer, Float,

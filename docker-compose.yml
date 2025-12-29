@@ -42,8 +42,6 @@ services:
       - "9001:9001" # Console
     volumes:
       - miniodata:/data
-    # ⚠️ Не используем healthcheck (в образе может не быть curl/wget),
-    # вместо этого делаем надежное ожидание в minio-init.
 
   minio-init:
     image: minio/mc:latest
