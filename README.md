@@ -120,4 +120,14 @@ docker compose down -v
 * В базе данных сохраняется **только ключ объекта**, а не путь к файлу
 * Вся конфигурация осуществляется через `.env`
 * Проект предназначен для локальной разработки и демонстрации
-
+* Если у вас появляется ошибка 
+```
+Attaching to backend-1, emulator-1, frontend-1, minio-1, minio-init-1, ml-1, postgres-1, mediamtx
+Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:1936 -> 0.0.0.0:0: listen tcp 0.0.0.0:1936: bind: An attempt was made to access a socket in a way forbidden by its access permissions.
+```
+То нужно открыть командную строку от имени администратора и ввести следующие команды:
+```
+net stop winnat
+net start winnat
+```
+Затем запустить контейнер
