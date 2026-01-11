@@ -25,12 +25,3 @@ app.add_middleware(
 app.include_router(streams.router)
 app.include_router(events.router)
 app.include_router(internal.router)
-
-SNAPSHOT_DIR = Path("snapshots")
-SNAPSHOT_DIR.mkdir(exist_ok=True)
-
-app.mount(
-    "/snapshots",
-    StaticFiles(directory=SNAPSHOT_DIR),
-    name="snapshots",
-)

@@ -19,11 +19,12 @@ function App() {
           </div>
         </header>
 
-        <main className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.1fr)] gap-4 h-[calc(100vh-5.5rem)]">
-          <div className="h-full">
+        <main className="grid min-h-0 grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.1fr)] gap-4 h-[calc(100vh-5.5rem)]">
+          <div className="min-h-0 min-w-0">
             <HlsPlayer />
           </div>
-          <div className="h-full">
+
+          <div className="min-h-0 min-w-0">
             <EventsPanel />
           </div>
         </main>

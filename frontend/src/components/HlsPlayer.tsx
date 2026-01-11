@@ -17,15 +17,12 @@ export default function HlsPlayer() {
         setError(null);
 
         const hlsUrl = await fetchStreamHlsUrl();
-
         const video = videoRef.current;
         if (!video) return;
 
         if (video.canPlayType("application/vnd.apple.mpegurl")) {
-          // Safari / iOS
           video.src = hlsUrl;
         } else if (Hls.isSupported()) {
-          // остальные браузеры
           hls = new Hls({
             enableWorker: true,
             lowLatencyMode: true,
@@ -37,9 +34,7 @@ export default function HlsPlayer() {
           return;
         }
 
-        if (!cancelled) {
-          setLoading(false);
-        }
+        if (!cancelled) setLoading(false);
       } catch (e) {
         console.error(e);
         if (!cancelled) {
@@ -53,20 +48,16 @@ export default function HlsPlayer() {
 
     return () => {
       cancelled = true;
-      if (hls) {
-        hls.destroy();
-      }
+      if (hls) hls.destroy();
     };
   }, []);
 
   return (
-    <div className="w-full h-full flex flex-col rounded-2xl bg-black overflow-hidden shadow-lg">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+    <div className="w-full rounded-2xl rounded-2xl bg-black overflow-hidden shadow-lg">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 shrink-0">
         <div className="flex flex-col">
           <span className="text-sm text-white/60">Live stream</span>
-          <span className="text-base font-medium text-white">
-            live_stream
-          </span>
+          <span className="text-base font-medium text-white">live_stream</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
@@ -76,7 +67,8 @@ export default function HlsPlayer() {
         </div>
       </div>
 
-      <div className="relative flex-1 bg-black">
+      {/* ВАЖНО: фиксируем пропорции */}
+      <div className="relative w-full aspect-video bg-black">
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center text-sm text-white/60">
             Подключаюсь к потоку...
@@ -89,7 +81,7 @@ export default function HlsPlayer() {
         )}
         <video
           ref={videoRef}
-          className="w-full h-full object-contain"
+          className="absolute inset-0 h-full w-full object-contain"
           autoPlay
           muted
           controls
