@@ -84,22 +84,6 @@ docker compose up -d --build
 
 ---
 
-## Проверка сохранения snapshot’ов
-
-Проверить содержимое бакета MinIO:
-
-```bash
-docker compose exec minio-init mc ls local/snapshots | head
-```
-
-Открыть любой snapshot в браузере:
-
-```
-http://localhost:9000/snapshots/<имя_файла>.jpg
-```
-
----
-
 ## Остановка сервисов
 
 ```bash
